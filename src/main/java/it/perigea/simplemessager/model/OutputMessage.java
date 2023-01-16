@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OutputMessage {
-    private String text;
     private String from;
+    private String text;
     private String time;
 
 }

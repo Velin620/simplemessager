@@ -1,21 +1,31 @@
 import React from 'react'
 import { useState } from 'react'
 import { Profile, MessageView } from '../index'
-
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
-
 
 const Connector = () => {
     const [isConnected, setConnected] = useState(false);
     const [author, setAuthor] = useState('');
-    const [stompClient, setStompClient] = useState(null);
+    const [outputMessage, setOutputMessage] = useState(null);
+    
 
-    const socket = new SockJS('/chat');
-    setStompClient(Stomp.over(socket));  
-    stompClient.connect({}, function(frame) {
-      console.log('Connected: ' + frame);
-    });  
+    let stompClient = connectStomp();
+
+    function connectStomp() {
+        let stompClient = null;
+        const socket = new SockJS('http://localhost:8080/chat');
+        console.log("socket: " + socket);
+        stompClient= Stomp.over(socket);  
+        stompClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/topic/messages', function(OutputMessage) {
+            setOutputMessage( OutputMessage);
+            console.log("outputMessage: " + outputMessage);
+        });
+        }); 
+        return stompClient;
+    }
 
     const handleConnected = (connected) => {
         setConnected(connected);
@@ -33,8 +43,12 @@ const Connector = () => {
                 handleConnected={(x) => handleConnected(x)} 
                 handleAuthor = {(a) => handleAuthor(a)} 
                 stompClient={stompClient}
-                setStompClient = {(stomp) => setStompClient(stomp)}/>
-            <MessageView isConnected={isConnected} author={author} stompClient={stompClient}/>
+                />
+            <MessageView 
+                isConnected={isConnected} 
+                author={author} 
+                outputMessage = {outputMessage} 
+                stompClient = {stompClient}/>
         </>
     )
 }

@@ -4,12 +4,14 @@ import it.perigea.simplemessager.model.MessageModel;
 import it.perigea.simplemessager.model.OutputMessage;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@RestController("/messager")
+@RestController
+//@CrossOrigin(allowedHeaders = "*", origins = "*", originPatterns = "*")
 public class MessageHandlingController {
 
     @MessageMapping("/chat")

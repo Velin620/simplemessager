@@ -10,9 +10,9 @@ const Profile = ({isConnected, handleConnected, handleAuthor, stompClient}) => {
 }
 
 function disconnect() {
-  // if(stompClient != null) {
-  //     stompClient.disconnect();
-  // }
+  if(stompClient != null) {
+      stompClient.disconnect();
+  }
   handleConnected(false);
   console.log("Disconnected");
 }
