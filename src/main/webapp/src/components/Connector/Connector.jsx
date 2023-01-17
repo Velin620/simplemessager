@@ -1,53 +1,58 @@
 import React from 'react'
 import { useState } from 'react'
-import { Profile, MessageView } from '../index'
+import { Profile, MessageView, ChatChoice } from '../index'
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 
 const Connector = () => {
-    const [isConnected, setConnected] = useState(false);
+    const [connection, setConnection] = useState("disconnected");
     const [author, setAuthor] = useState('');
-    const [outputMessage, setOutputMessage] = useState(null);
+    
+    let currentChat = "allchat";
+    let stompClient = null;
     
 
-    let stompClient = connectStomp();
-
-    function connectStomp() {
+    function connectStomp(chat) {
+        let url = null;
+        currentChat = chat;
+        chat === "allchat" ? url = "allchat" : url = "private/" + chat;
         let stompClient = null;
-        const socket = new SockJS('http://localhost:8080/chat');
-        console.log("socket: " + socket);
+        const socket = new SockJS(`http://localhost:8080/${url}`);
         stompClient= Stomp.over(socket);  
         stompClient.connect({}, function(frame) {
+        setConnection("connected");
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/messages', function(OutputMessage) {
-            setOutputMessage( OutputMessage);
-            console.log("outputMessage: " + outputMessage);
-        });
         }); 
+        console.log('Connected');
         return stompClient;
     }
 
-    const handleConnected = (connected) => {
-        setConnected(connected);
+    const handleDisconnect = () => {
+        stompClient && stompClient.disconnect();
+        setConnection("disconnected");
+        console.log("Disconnected");
     }
 
     const handleAuthor = (author) => {
         setAuthor(author);
+        console.log(author);
     }
 
   
     return (
         <>
             <Profile 
-                isConnected={isConnected} 
-                handleConnected={(x) => handleConnected(x)} 
-                handleAuthor = {(a) => handleAuthor(a)} 
-                stompClient={stompClient}
-                />
-            <MessageView 
-                isConnected={isConnected} 
                 author={author} 
-                outputMessage = {outputMessage} 
+                handleAuthor = {(a) => handleAuthor(a)} 
+                />
+            <ChatChoice 
+                handleConnect = {(c) => connectStomp(c)}
+                handleDisconnect = {() => handleDisconnect()}
+            />
+            <MessageView 
+                connection={connection} 
+                author={author} 
+                currentChat = {currentChat} 
                 stompClient = {stompClient}/>
         </>
     )

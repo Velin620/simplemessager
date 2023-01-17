@@ -1,19 +1,19 @@
 import React from 'react'
 
 
-const Profile = ({isConnected, handleConnected, handleAuthor, stompClient}) => {
+const Profile = ({handleAuthor, author}) => {
 
-  function connect() {
-    handleConnected(true);
-    handleAuthor(document.getElementById('from').value);
-    console.log('Connected');
+let newAuthor = null
+
+
+function connect() {
+  newAuthor = document.getElementById('from').value;
+  handleAuthor(newAuthor);
+  console.log('Author: ' + newAuthor);
 }
 
 function disconnect() {
-  if(stompClient != null) {
-      stompClient.disconnect();
-  }
-  handleConnected(false);
+  handleAuthor(null);
   console.log("Disconnected");
 }
 
@@ -23,12 +23,14 @@ function disconnect() {
       <div>
         <input type="text" id="from" placeholder="Choose a nickname"/>
       </div>
-      <br />
       <div>
-        <button id="connect" disabled={isConnected} onClick={() => connect()}>Connect</button>
-        <button id="disconnect" disabled={!isConnected} onClick={() => disconnect()}>
-        Disconnect
-        </button>
+        {author === null && newAuthor != null ? 
+          <button onClick={connect}>Connect</button> :
+          author != null && newAuthor != null ?
+          <button onClick={connect}>Change username</button> :
+          author != null && newAuthor === null ?
+          <button onClick={disconnect}>Disconnect</button> :
+          <button disabled = "true" >Connect</button>}
       </div>
       <br />
     </div>

@@ -1,38 +1,40 @@
 import React from 'react'
-import { useEffect } from 'react'
+import axios from 'axios';
 
+const MessageView = ({connection, author, stompClient, currentChat}) => {
+  
+  let lastPrinted = 0;
 
-const MessageView = ({isConnected, author, stompClient, outputMessage}) => {
-  
-  useEffect (() => {
-    showMessageOutput(outputMessage);
-    console.log("message: " + outputMessage);
-  }, [outputMessage] );
-  
   function sendMessage() {
     const from = author;
     const text = document.getElementById('text').value;
-    stompClient.send("/app/chat", {}, 
+    stompClient.send(currentChat === "allchat"? "/app/allchat" : `/app/private/${currentChat}`, {}, 
     JSON.stringify({'from':from, 'text':text}));
-    
-    console.log("outputMessage " + outputMessage);
   }
   
-  function showMessageOutput(outputMessage) {
-    if (outputMessage === null) 
-    return;
-    else{
-      let message = JSON.parse(outputMessage.body);
-      const response = document.getElementById('response');
-      let p = document.createElement('p');
-      p.appendChild(document.createTextNode(message.from + ": " 
-      + message.text + " (" + message.time + ")"));
-      response.appendChild(p);
-    }
+  async function showMessageOutput() {  
+    axios.get(`http://localhost:8080/${currentChat}/history`)
+    .then(response => {
+      const data = response.data;
+      let messageDiv = document.getElementById("response");
+      
+      if (lastPrinted < data[0].id){
+        let nextPrint = 0;
+        for (nextPrint; lastPrinted < data[nextPrint].id; nextPrint++) {
+          ;
+        }
+        for(nextPrint; nextPrint >= 0; nextPrint--){
+          messageDiv.innerHTML += `<p>${data[nextPrint].from}: ${data[nextPrint].text} (${data[nextPrint].time}) </p>`;
+          lastPrinted = data[nextPrint].id;
+        }
+      }else{
+        return;
+      }
+    })
   }
   
   return (
-    <div id="MessageView" style={{visibility: isConnected? "visible" : "hidden"}}>
+    <div id="MessageView" style={{visibility: connection === "connected" ? "visible" : "hidden"}}>
     
     <div id="conversationDiv">
     <input type="text" id="text" placeholder="Write a message..."/>
@@ -41,7 +43,7 @@ const MessageView = ({isConnected, author, stompClient, outputMessage}) => {
     <p id = "response"></p>
     
     </div>
-    {showMessageOutput(outputMessage)}
+    {setTimeout(()=> showMessageOutput(), 5000)}
     </div>
     )
   }
