@@ -4,36 +4,37 @@ import { Profile, MessageView, ChatChoice } from '../index'
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 
-const Connector = () => {
+function Connector () {
     const [connection, setConnection] = useState("disconnected");
     const [author, setAuthor] = useState('');
-    
-    let currentChat = "allchat";
-    let stompClient = null;
+    const [stompClient, setStompClient] = useState(null);
+    const [currentChat, setCurrentChat] = useState("allchat");
     
 
     function connectStomp(chat) {
         let url = null;
-        currentChat = chat;
+        setCurrentChat (chat);
         chat === "allchat" ? url = "allchat" : url = "private/" + chat;
-        let stompClient = null;
         const socket = new SockJS(`http://localhost:8080/${url}`);
-        stompClient= Stomp.over(socket);  
-        stompClient.connect({}, function(frame) {
-        setConnection("connected");
-        console.log('Connected: ' + frame);
+        let st = Stomp.over(socket);
+        console.log(st);
+        console.log(stompClient);
+        st.connect({}, function(frame) {
+            setConnection("connected");
+            console.log('Connected: ' + frame);
         }); 
+        setStompClient(st);
         console.log('Connected');
         return stompClient;
     }
 
-    const handleDisconnect = () => {
+    function handleDisconnect() {
         stompClient && stompClient.disconnect();
         setConnection("disconnected");
         console.log("Disconnected");
     }
 
-    const handleAuthor = (author) => {
+    function handleAuthor(author) {
         setAuthor(author);
         console.log(author);
     }
@@ -49,11 +50,12 @@ const Connector = () => {
                 handleConnect = {(c) => connectStomp(c)}
                 handleDisconnect = {() => handleDisconnect()}
             />
-            <MessageView 
-                connection={connection} 
-                author={author} 
-                currentChat = {currentChat} 
-                stompClient = {stompClient}/>
+            {connection === "connected" ?
+                <MessageView  
+                    author={author} 
+                    currentChat = {currentChat} 
+                    stompClient = {stompClient}/>:
+                <p>Not connected</p>}
         </>
     )
 }

@@ -33,7 +33,7 @@ public class SenderService {
 
     public OutputMessageDto sendPrivate(MessageModel message, String username) {
         String time = new SimpleDateFormat("HH:mm").format(new Date());
-        OutputMessageDto result = new OutputMessageDto(message.getFrom(), username, message.getText(), time);
+        OutputMessageDto result = new OutputMessageDto(message.getFrom(), message.getTo(), message.getText(), time);
         OutputMessage outputMessage = messageMapper.toEntity(result);
         messageHistoryRepository.save(outputMessage);
         return result;

@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface MessageHistoryRepository extends JpaRepository<OutputMessage, Integer> {
 
-    @Query("SELECT m FROM OutputMessage m WHERE m.to = :chat ORDER BY m.id DESC")
+    @Query("SELECT m FROM OutputMessage m WHERE m.to = :chat OR m.from = :chat ORDER BY m.id DESC")
     List<OutputMessage> findByChat(@Param("chat") String chat);
 }

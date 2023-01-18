@@ -17,6 +17,7 @@ public class MessageMapper {
 
         OutputMessageDto outputMessageDto = new OutputMessageDto();
 
+        outputMessageDto.setId( outputMessage.getId() );
         outputMessageDto.setFrom( outputMessage.getFrom() );
         outputMessageDto.setTo( outputMessage.getTo() );
         outputMessageDto.setText( outputMessage.getText() );

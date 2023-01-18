@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@CrossOrigin(allowedHeaders = "*", originPatterns = "*")
+//@CrossOrigin(allowedHeaders = "*", originPatterns = "*")
 public class MessageHandlingController {
 
     @Autowired
@@ -37,6 +37,7 @@ public class MessageHandlingController {
     }
 
     @GetMapping("/{chatName}/history")
+    @CrossOrigin(allowedHeaders = "*", originPatterns = "*")
     public List<OutputMessageDto> getHistory(@PathVariable String chatName) {
         return senderService.getHistory(chatName);
     }

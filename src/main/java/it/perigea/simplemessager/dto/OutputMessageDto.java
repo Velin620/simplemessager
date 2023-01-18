@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class OutputMessageDto {
 
+    private Integer id;
     private String from;
     private String to;
 
