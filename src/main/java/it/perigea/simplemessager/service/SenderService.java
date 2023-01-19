@@ -39,9 +39,9 @@ public class SenderService {
         return result;
     }
 
-    public List<OutputMessageDto> getHistory(String chatName) {
+    public List<OutputMessageDto> getHistory(String chatName, String username) {
 
-        List<OutputMessage> outputMessageList = messageHistoryRepository.findByChat(chatName);
+        List<OutputMessage> outputMessageList = messageHistoryRepository.findByChat(chatName, username);
         return messageMapper.toDtoList(outputMessageList);
     }
 }

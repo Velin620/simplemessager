@@ -36,9 +36,9 @@ public class MessageHandlingController {
         return result;
     }
 
-    @GetMapping("/{chatName}/history")
+    @GetMapping("/{chatName}-{username}/history")
     @CrossOrigin(allowedHeaders = "*", originPatterns = "*")
-    public List<OutputMessageDto> getHistory(@PathVariable String chatName) {
-        return senderService.getHistory(chatName);
+    public List<OutputMessageDto> getHistory(@PathVariable String chatName, @PathVariable String username) {
+        return senderService.getHistory(chatName, username);
     }
 }

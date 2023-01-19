@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import { Profile, MessageView, ChatChoice } from '../index'
+import { Profile, MessageView, MessageSend, ChatChoice } from '../index'
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
 
@@ -12,6 +12,7 @@ function Connector () {
     
 
     function connectStomp(chat) {
+        setConnection("disconnected");
         let url = null;
         setCurrentChat (chat);
         chat === "allchat" ? url = "allchat" : url = "private/" + chat;
@@ -51,11 +52,17 @@ function Connector () {
                 handleDisconnect = {() => handleDisconnect()}
             />
             {connection === "connected" ?
-                <MessageView  
+                <MessageSend  
                     author={author} 
                     currentChat = {currentChat} 
                     stompClient = {stompClient}/>:
                 <p>Not connected</p>}
+            {connection === "connected" ?
+                <MessageView  
+                    author={author}
+                    currentChat = {currentChat} />:
+                <></>}
+
         </>
     )
 }
