@@ -1,44 +1,45 @@
 package it.perigea.simplemessager.controller;
 
-import it.perigea.simplemessager.dto.OutputMessageDto;
+
+
+import it.perigea.simplemessager.configuration.WebSocketConfig;
 import it.perigea.simplemessager.model.MessageModel;
-import it.perigea.simplemessager.service.SenderService;
+import it.perigea.simplemessager.model.OutputMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.messaging.handler.annotation.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.stereotype.Controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.security.Principal;
 
-@RestController
-//@CrossOrigin(allowedHeaders = "*", originPatterns = "*")
+@Controller
 public class MessageHandlingController {
 
     @Autowired
-    private SenderService senderService;
+    private SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageMapping("/allchat")
-//    @SendTo("/topic/messages")
-    public OutputMessageDto sendAll(MessageModel message) throws Exception {
-        OutputMessageDto result = senderService.sendAll(message);
-        return result;
+    @MessageMapping("/hello")
+    @SendTo("/topic/greetings")
+    public OutputMessage sendBroadcast(MessageModel message) throws Exception {
+        Thread.sleep(1000); // simulated delay
+        return new OutputMessage(message.getFrom());
+    }
+    @SubscribeMapping("/subscribe")
+    public String sendOneTimeMessage() {
+        return "server one-time message via the application";
     }
 
-    @MessageMapping("/private/{username}")
-//    @SendTo("/queue/private/{username}")
-    public OutputMessageDto sendPrivate(@PathVariable String username, MessageModel message) throws Exception {
-        OutputMessageDto result = senderService.sendPrivate(message, username);
-        return result;
-    }
-
-    @GetMapping("/{chatName}-{username}/history")
-    @CrossOrigin(allowedHeaders = "*", originPatterns = "*")
-    public List<OutputMessageDto> getHistory(@PathVariable String chatName, @PathVariable String username) {
-        return senderService.getHistory(chatName, username);
+    @MessageMapping("/private")
+//    @SendToUser("/queue/chat") invia il messaggio al client che ha fatto la richiesta
+    public void sendPrivate(@Payload MessageModel message) throws Exception {
+        System.out.println("===============================================");
+        System.out.println("debug: MessageHandlingController.sendPrivate");
+//        System.out.println("debug: username: " + principal.getName());
+        System.out.println("debug: destination user: " + message.getTo());
+        System.out.println("===============================================");
+        String output = "Hello " + message.getTo() + " from " + message.getFrom();
+        simpMessagingTemplate.convertAndSendToUser(message.getTo(), "/queue/chat", output); // invia il messaggio al client specificato
     }
 }
