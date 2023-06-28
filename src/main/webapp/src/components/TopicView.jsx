@@ -3,15 +3,16 @@ import {useState} from "react";
 
 function TopicView( {stompClient, username} ) {
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subId, setSubId] = useState('');
 
   function setConnected(connected) {
     setIsSubscribed(connected);
-    const conversationDiv = document.getElementById('conversation');
-    if (connected) {
-      conversationDiv.style.visibility = 'visible';
-    }else{
-      conversationDiv.style.visibility = 'hidden';
-    }
+    // const conversationDiv = document.getElementById('conversation');
+    // if (connected) {
+    //   conversationDiv.style.visibility = 'visible';
+    // }else{
+    //   conversationDiv.style.visibility = 'hidden';
+    // }
   }
 
   function connectMessage() {
@@ -23,6 +24,7 @@ function TopicView( {stompClient, username} ) {
     stompClient.subscribe('/topic/greetings', function (greeting) {
       console.log(greeting);
       showGreeting(JSON.parse(greeting.body).text);
+      setSubId(greeting.headers.subscription);
     });
     setConnected(true);
     console.log('Connected message');
@@ -33,7 +35,7 @@ function TopicView( {stompClient, username} ) {
       setConnected(false)
       return;
     }
-    stompClient.unsubscribe('/topic/greetings');
+    stompClient.unsubscribe(subId);
     setConnected(false);
     console.log("Disconnected Message");
   }

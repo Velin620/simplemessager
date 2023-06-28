@@ -10,12 +10,12 @@ function PrivateView( {stompClient, username, setConnected} ) {
 
   function setSubscribed(connected) {
     setIsSubscribed(connected);
-    const conversationDiv = document.getElementById('conversation');
-    if (connected) {
-      conversationDiv.style.visibility = 'visible';
-    }else{
-      conversationDiv.style.visibility = 'hidden';
-    }
+    // const conversationDiv = document.getElementById('conversation');
+    // if (connected) {
+    //   conversationDiv.style.visibility = 'visible';
+    // }else{
+    //   conversationDiv.style.visibility = 'hidden';
+    // }
   }
 
   function connectMessage() {

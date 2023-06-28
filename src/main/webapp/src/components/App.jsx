@@ -70,7 +70,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App" style = {{margin : 15} }>
       <label htmlFor="name">Your name </label>
       <input type="text" id="name"
              placeholder="Your name here..." ></input>

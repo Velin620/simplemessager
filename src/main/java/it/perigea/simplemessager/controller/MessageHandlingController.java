@@ -2,17 +2,18 @@ package it.perigea.simplemessager.controller;
 
 
 
-import it.perigea.simplemessager.configuration.WebSocketConfig;
-import it.perigea.simplemessager.model.MessageModel;
-import it.perigea.simplemessager.model.OutputMessage;
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.*;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
-import java.security.Principal;
+import it.perigea.simplemessager.model.MessageModel;
+import it.perigea.simplemessager.model.OutputMessage;
 
 @Controller
 public class MessageHandlingController {
@@ -23,9 +24,24 @@ public class MessageHandlingController {
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
     public OutputMessage sendBroadcast(MessageModel message) throws Exception {
+    	System.out.println("===============================================");
+        System.out.println("debug: MessageHandlingController.sendBroadcast");
+        System.out.println("debug: user: " + message.getFrom());
+        System.out.println("===============================================");
         Thread.sleep(1000); // simulated delay
         return new OutputMessage(message.getFrom());
     }
+
+    @SubscribeMapping("/hello")
+    public OutputMessage sendBroadcast() throws Exception {
+    	System.out.println("===============================================");
+        System.out.println("debug: MessageHandlingController.sendBroadcast");
+        System.out.println("===============================================");
+        Thread.sleep(1000); // simulated delay
+        return new OutputMessage("server");
+    }
+
+
     @SubscribeMapping("/subscribe")
     public String sendOneTimeMessage() {
         return "server one-time message via the application";
@@ -33,10 +49,10 @@ public class MessageHandlingController {
 
     @MessageMapping("/private")
 //    @SendToUser("/queue/chat") invia il messaggio al client che ha fatto la richiesta
-    public void sendPrivate(@Payload MessageModel message) throws Exception {
+    public void sendPrivate(@Payload MessageModel message, Principal principal) throws Exception {
         System.out.println("===============================================");
         System.out.println("debug: MessageHandlingController.sendPrivate");
-//        System.out.println("debug: username: " + principal.getName());
+        System.out.println("debug: username: " + principal.getName());
         System.out.println("debug: destination user: " + message.getTo());
         System.out.println("===============================================");
         String output = "Hello " + message.getTo() + " from " + message.getFrom();

@@ -16,9 +16,15 @@ public class UserChannelInterceptor implements ChannelInterceptor {
                 MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String username = accessor.getFirstNativeHeader("username");
-            System.out.println("debug: username set to: " + username);
+            System.out.println("===============================================");
+	        System.out.println("debug: UserChannelInterceptor.preSend() called");
+	        System.out.println("debug: message: " + message);
+	        System.out.println("debug: channel: " + channel);
+	        System.out.println("debug: username set to: " + username);
+	        System.out.println("===============================================");
             accessor.setUser(new User(username));
         }
+        
         return message;
     }
 
